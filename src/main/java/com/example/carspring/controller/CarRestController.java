@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -17,17 +18,18 @@ public class CarRestController {
 
     private List<Car> cars;
 
-    public CarRestController(List<Car> cars) {
+    public CarRestController() {
         this.cars = new ArrayList<>();
         cars.add(new Car(1L, "Kamaz", "6540", "yellow"));
-        cars.add(new Car(1L, "Star", "66", "blue"));
-        cars.add(new Car(1L, "Robur", "LD-3001", "red"));
+        cars.add(new Car(2L, "Star", "66", "blue"));
+        cars.add(new Car(3L, "Robur", "LD-3001", "red"));
+        cars.add(new Car(4L, "Nysa", "4", "yellow"));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Car>> getAllCars() {
-        return new ResponseEntity<>(cars, HttpStatus.OK);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<Car>> getAllCars() {
+//        return new ResponseEntity<>(cars, HttpStatus.OK);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Car> getCarById(@PathVariable long id) {
@@ -40,12 +42,19 @@ public class CarRestController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("{color}")
-    public ResponseEntity<List<Car>> getCarsByColor(@RequestParam String color) {
-        List<Car> carsByColor = cars.stream()
-                .filter(e -> e.getColor().toLowerCase() == color.toLowerCase())
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(carsByColor, HttpStatus.NOT_FOUND);
+    @GetMapping()
+    public ResponseEntity<List<Car>> getCarsByColor(@RequestParam(required = false) String color) {
+        if (Objects.isNull(color)) {
+            return ResponseEntity.ok(cars);
+        } else {
+            List<Car> carsByColor = cars.stream()
+                    .filter(e -> e.getColor().equals(color))
+                    .collect(Collectors.toList());
+            if (carsByColor.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(carsByColor);
+        }
     }
 
 }
