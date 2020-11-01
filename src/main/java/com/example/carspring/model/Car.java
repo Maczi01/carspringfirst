@@ -1,7 +1,5 @@
 package com.example.carspring.model;
 
-import org.springframework.context.annotation.Bean;
-
 public class Car {
 
     private long id;
