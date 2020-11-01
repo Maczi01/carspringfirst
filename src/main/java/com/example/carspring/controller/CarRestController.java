@@ -2,6 +2,7 @@ package com.example.carspring.controller;
 
 import com.example.carspring.model.Car;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +13,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/cars")
+@RequestMapping(path = "/cars",
+                produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 public class CarRestController {
 
     private List<Car> cars;
@@ -66,7 +68,7 @@ public class CarRestController {
                 .filter(e -> e.getId() == carToEdit.getId())
                 .findFirst();
         if (optionalCar.isPresent()) {
-            cars.remove(optionalCar);
+            cars.remove(optionalCar.get());
             cars.add(carToEdit);
             return new ResponseEntity(HttpStatus.CREATED);
         } else {
@@ -74,7 +76,7 @@ public class CarRestController {
         }
     }
 
-    @PatchMapping()
+    @PatchMapping("/{id}")
     public ResponseEntity editColor(@PathVariable long id, @RequestBody Car carToEdit) {
         Optional<Car> optionalCar = cars.stream().filter(e -> e.getId() == id).findFirst();
         if (optionalCar.isPresent()) {
