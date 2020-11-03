@@ -46,7 +46,7 @@ public class CarRestController {
 
     @PostMapping
     public ResponseEntity addCar(@RequestBody Car carToAdd) {
-        if (cars.add(carToAdd)) {
+        if (carService.addCar(carToAdd)) {
             return new ResponseEntity(HttpStatus.CREATED);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -54,27 +54,16 @@ public class CarRestController {
 
     @PutMapping()
     public ResponseEntity editCar(@RequestBody Car carToEdit) {
-        Optional<Car> optionalCar = cars
-                .stream()
-                .filter(e -> e.getId() == carToEdit.getId())
-                .findFirst();
-        if (optionalCar.isPresent()) {
-            cars.remove(optionalCar.get());
-            cars.add(carToEdit);
+        if (carService.editCar(carToEdit)) {
             return new ResponseEntity(HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity editCarParameters(@PathVariable long id, @RequestBody Car carToEdit) {
-        Optional<Car> optionalCar = cars.stream().filter(e -> e.getId() == id).findFirst();
-        if (optionalCar.isPresent()) {
-            Car car = optionalCar.get();
-            car.setBrand(carToEdit.getBrand());
-            car.setModel(carToEdit.getModel());
-            car.setColor(carToEdit.getColor());
+        boolean editCar = carService.editCarParameters(id, carToEdit.getColor(), carToEdit.getBrand(), carToEdit.getModel());
+        if (editCar) {
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -83,11 +72,7 @@ public class CarRestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteCar(@PathVariable long id) {
-        Optional<Car> optionalCar = cars.stream()
-                .filter(e -> e.getId() == id)
-                .findFirst();
-        if (optionalCar.isPresent()) {
-            cars.remove(optionalCar.get());
+        if (carService.deleteCar(id)) {
             return ResponseEntity.ok().build();
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
