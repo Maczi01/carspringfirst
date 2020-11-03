@@ -37,15 +37,10 @@ public class CarRestController {
     @GetMapping()
     public ResponseEntity<List<Car>> getCarsByColor(@RequestParam(required = false) String color) {
         if (Objects.isNull(color)) {
-            return ResponseEntity.ok(cars);
+            return ResponseEntity.ok(carService.findAll());
         } else {
-            List<Car> carsByColor = cars.stream()
-                    .filter(e -> e.getColor().equals(color))
-                    .collect(Collectors.toList());
-            if (carsByColor.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(carsByColor);
+
+            return ResponseEntity.ok(carService.getCarsByColor(color));
         }
     }
 
